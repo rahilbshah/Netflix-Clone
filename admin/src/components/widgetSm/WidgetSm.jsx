@@ -1,23 +1,12 @@
 import "./widgetSm.css";
 import { useEffect, useState } from "react";
-import axios from 'axios'
+import useFetch from "../../hook/useFetch";
 export default function WidgetSm() {
   const [newUsers, setNewUsers] = useState([])
+  const {data} = useFetch('/user?new=true')
   useEffect(() => {
-    const getNewUsers = async () => {
-      try {
-        const res = await axios.get('/user?new=true', {
-          headers: {
-            token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMDIwNjk2NTRiOWRmNGNlNDllYmRjMiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY2MTE4NTc3NCwiZXhwIjoxNjYxNjE3Nzc0fQ.Cx6hptyUY_rnragwEQOtu-P5TQysIjUceZ7LtumdmRY"
-          }
-        })
-        setNewUsers(res.data)
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getNewUsers();
-  },[])
+    setNewUsers(data)
+  },[data])
   return (  
     <div className="widgetSm">
       <span className="widgetSmTitle">New Join Members</span>

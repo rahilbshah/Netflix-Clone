@@ -1,21 +1,38 @@
 import "./userList.css";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
-import { userRows } from "../../dummyData";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
+import useFetch from "../../hook/useFetch";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function UserList() {
-  const [data, setData] = useState(userRows);
+  const [user, setUser] = useState([])
+  const {data} = useFetch('/user')
 
-  const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
+  useEffect(()=>{
+    setUser(data)
+    console.log(data);
+  },[data])
+
+
+  const handleDelete = async (id) => {
+    try {
+       await axios.delete(`/user/${id}`, {
+        headers: {
+          token: JSON.parse(localStorage.getItem("user")).token
+        }
+      })
+      setUser(user.filter((item)=>item._id !== id))
+    } catch (error) {
+      console.log(error);
+    }
   };
-
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
+    { field: "_id", headerName: "ID", width: 200 },
     {
       field: "user",
       headerName: "User",
@@ -23,23 +40,13 @@ export default function UserList() {
       renderCell: (params) => {
         return (
           <div className="userListUser">
-            <img className="userListImg" src={params.row.avatar} alt="" />
+            <img className="userListImg" src={params.row.profilePic || "https://i.ibb.co/MBtjqXQ/no-avatar.gif"} alt="" />
             {params.row.username}
           </div>
         );
       },
     },
-    { field: "email", headerName: "Email", width: 200 },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 120,
-    },
-    {
-      field: "transaction",
-      headerName: "Transaction Volume",
-      width: 160,
-    },
+    { field: "email", headerName: "Email", width: 230 },
     {
       field: "action",
       headerName: "Action",
@@ -52,7 +59,7 @@ export default function UserList() {
             </Link>
             <DeleteOutline
               className="userListDelete"
-              onClick={() => handleDelete(params.row.id)}
+              onClick={() => handleDelete(params.row._id)}
             />
           </>
         );
@@ -67,11 +74,12 @@ export default function UserList() {
       <Sidebar />
       <div className="userList">
           <DataGrid
-            rows={data}
+            rows={user}
             disableSelectionOnClick
             columns={columns}
             pageSize={8}
             checkboxSelection
+            getRowId={r=>r._id}
           />
         </div>
       </div>

@@ -4,35 +4,34 @@ import { DeleteOutline } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Topbar from "../../components/topbar/Topbar";
-import { useEffect } from "react";
-import { useContext } from "react";
-import { MovieContext } from "../../context/movieContext";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import useFetch from "../../hook/useFetch";
 
 export default function ProductList() {
+  const {data}= useFetch("/movies")
+  const [movie, setMovie] = useState(data)
 
-  const {movies, dispatch } = useContext(MovieContext)
-  useEffect(() => {
-    const getMovies = async () => {
-      dispatch({ type: "GET_MOVIE_START" })
-      try {
-        const res = await axios.get("/movies", {
-          headers: {
-            token: JSON.parse(localStorage.getItem("user")).token
-          }
-        })
-        dispatch({ type: "GET_MOVIE_SUCCESS", payload: res.data });
-      } catch (error) {
-        dispatch({ type: "GET_MOVIE_FAILURE", payload: error.response.data });
-      }
+
+  useEffect(()=>{
+     setMovie(data)
+    // console.log(data);
+  },[data])
+
+  
+  
+  const handleDelete = async (id) => {
+    try {
+       await axios.delete(`/movies/${id}`, {
+        headers: {
+          token: JSON.parse(localStorage.getItem("user")).token
+        }
+      })
+      setMovie(movie.filter((item)=>item._id !== id))
+    } catch (error) {
+      console.log(error);
     }
-    getMovies()
-  },[dispatch])
-  
-  
-  // const handleDelete = (id) => {
-
-  // };
+  };
 
   const columns = [
     { field: "_id", headerName: "ID", width: 200 },
@@ -66,7 +65,7 @@ export default function ProductList() {
             </Link>
             <DeleteOutline
               className="productListDelete"
-              // onClick={() => handleDelete(params.row.id)}
+              onClick={() => handleDelete(params.row._id)}
             />
           </>
         );
@@ -81,7 +80,7 @@ export default function ProductList() {
         <Sidebar />
         <div className="productList">
           <DataGrid
-            rows={movies}
+            rows={movie}
             disableSelectionOnClick
             columns={columns}
             pageSize={8}

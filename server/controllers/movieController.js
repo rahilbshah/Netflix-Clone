@@ -1,3 +1,4 @@
+import Lists from '../models/listModel.js';
 import Movie from '../models/movieModel.js'
 
 
@@ -34,7 +35,9 @@ export const updateMovie = async (req, res) => {
 export const deleteMovie = async (req, res) => {
     const movie = await Movie.findById(req.params.id);
     if (movie) {
+        const lists = await Lists.find({type:movie.isSeries ? "series" : "movies",genre:movie.genre})
         try {
+            await Lists.findByIdAndUpdate(lists.map(r=>r._id),{$pull:{content:movie._id}})
             await Movie.findByIdAndDelete(req.params.id);
             res.status(200).json("The movie has been deleted...");
         } catch (err) {
