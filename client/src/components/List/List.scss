@@ -11,7 +11,6 @@
 
   .wrapper {
     position: relative;
-
     .sliderArrow {
       width: 50px;
       height: 100%;
@@ -32,15 +31,13 @@
         right: 0;
       }
     }
-    .container{
-        margin-left: 50px;
-        display: grid;
-        grid-template-columns: repeat(10,1fr);
-        gap: 5px;
-        margin-top: 10px;
-        width: max-content;
-        transform: translateX(0px);
-        transition: all 1s ease;
+    .container {
+      margin-left: 50px;
+      display: flex;
+      margin-top: 10px;
+      width: max-content;
+      transform: translateX(0px);
+      transition: all 1s ease;
     }
   }
 }

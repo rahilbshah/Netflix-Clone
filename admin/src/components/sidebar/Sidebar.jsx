@@ -2,20 +2,35 @@ import "./sidebar.css";
 import {
   LineStyle,
   Timeline,
-  TrendingUp,
   PermIdentity,
   AttachMoney,
   BarChart,
   MailOutline,
   DynamicFeed,
   ChatBubbleOutline,
-  WorkOutline,
-  Report,
   PlayCircleFilledOutlined,
+  ExitToApp
 } from "@material-ui/icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 
 export default function Sidebar() {
+  const location = useLocation();
+
+  const { dispatch } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    try {
+      dispatch({ type: "LOGOUT" })
+      navigate("/login")
+    } catch (error) {
+      dispatch({ type: "LOGIN_FAILURE", payload: error.response.data });
+    }
+  }
+
   return (
     <div className="sidebar">
       <div className="sidebarWrapper">
@@ -23,18 +38,14 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">Dashboard</h3>
           <ul className="sidebarList">
             <Link to="/" className="link">
-            <li className="sidebarListItem active">
-              <LineStyle className="sidebarIcon" />
-              Home
-            </li>
+              <li className={location.pathname === '/' ? "sidebarListItem active" : "sidebarListItem"}>
+                <LineStyle className="sidebarIcon" />
+                Home
+              </li>
             </Link>
             <li className="sidebarListItem">
               <Timeline className="sidebarIcon" />
               Analytics
-            </li>
-            <li className="sidebarListItem">
-              <TrendingUp className="sidebarIcon" />
-              Sales
             </li>
           </ul>
         </div>
@@ -42,13 +53,13 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">Quick Menu</h3>
           <ul className="sidebarList">
             <Link to="/users" className="link">
-              <li className="sidebarListItem">
+              <li className={location.pathname === '/users' ? "sidebarListItem active" : "sidebarListItem"}>
                 <PermIdentity className="sidebarIcon" />
                 Users
               </li>
             </Link>
             <Link to="/movies" className="link">
-              <li className="sidebarListItem">
+              <li className={location.pathname === '/movies' ? "sidebarListItem active" : "sidebarListItem"}>
                 <PlayCircleFilledOutlined className="sidebarIcon" />
                 Movies
               </li>
@@ -81,19 +92,11 @@ export default function Sidebar() {
           </ul>
         </div>
         <div className="sidebarMenu">
-          <h3 className="sidebarTitle">Staff</h3>
+          <h3 className="sidebarTitle">Action</h3>
           <ul className="sidebarList">
-            <li className="sidebarListItem">
-              <WorkOutline className="sidebarIcon" />
-              Manage
-            </li>
-            <li className="sidebarListItem">
-              <Timeline className="sidebarIcon" />
-              Analytics
-            </li>
-            <li className="sidebarListItem">
-              <Report className="sidebarIcon" />
-              Reports
+            <li onClick={handleLogout} className="sidebarListItem">
+              <ExitToApp  className="sidebarIcon" />
+              Logout
             </li>
           </ul>
         </div>
